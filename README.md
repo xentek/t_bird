@@ -2,6 +2,12 @@
 
 Straight forward file uploads for Ruby Apps.
 
+## Project Status
+
+- Build: [![Build Status](https://secure.travis-ci.org/xentek/t_bird.png)](http://travis-ci.org/xentek/t_bird)
+- Dependencies: [![Dependency Status](https://gemnasium.com/xentek/t_bird.png)](https://gemnasium.com/xentek/t_bird)
+- Code Quality: [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/xentek/t_bird.png)](https://codeclimate.com/github/xentek/t_bird)
+
 ## Installation
 
 Add this line to your application's Gemfile:
