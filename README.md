@@ -87,7 +87,7 @@ There are three options you can pass into your `TBird::Uploader` instance:
     - defaults to a `SHA1` digest of the `original_filename`
     - value should be URL safe, no encoding is done for you by `t_bird`
   - `:token`
-    - needs to be a unique value per upload, to help avoid name collisions and writing over existing files
+    - needs to be a unique value per upload, to help avoid name collisions and writing over any existing files
     - used as part of the filename, version and extension are
       automatically appended on to the end.
     - defaults to a [UUID](http://en.wikipedia.org/wiki/Universally_unique_identifier), think hard before straying from this strategy
