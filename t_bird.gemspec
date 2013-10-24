@@ -8,9 +8,12 @@ Gem::Specification.new do |gem|
   gem.version       = TBird::VERSION
   gem.authors       = ['Eric Marden']
   gem.email         = ['eric@xentek.net']
-  gem.description   = %q{Straight forward file uploads for Ruby Apps.}
+  gem.description   = %q{Straight forward file uploads for Ruby Apps. Decouple your uploads from your model.}
   gem.summary       = %q{Straight forward file uploads for Ruby Apps.}
-  gem.homepage      = 'https://github.com/xentek/t_bird'
+  gem.homepage      = 'http://xentek.github.io/t_bird'
+  gem.metadata      = { 'Github' => 'https://github.com/xentek/t_bird',
+                        'README' => 'https://github.com/xentek/t_bird/blob/master/README.md',
+                        'Issues' => 'https://github.com/xentek/t_bird/issues' }
   gem.license       = 'MIT'
 
   gem.files         = `git ls-files`.split($/)

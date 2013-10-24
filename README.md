@@ -6,6 +6,7 @@ _Uploading is... fun, fun, fun, until daddy takes the `t_bird` away._
 
 ## Project Status
 
+- Version: [![Gem Version](https://badge.fury.io/rb/t_bird.png)](http://badge.fury.io/rb/t_bird)
 - Build: [![Build Status](https://secure.travis-ci.org/xentek/t_bird.png)](http://travis-ci.org/xentek/t_bird)
 - Dependencies: [![Dependency Status](https://gemnasium.com/xentek/t_bird.png)](https://gemnasium.com/xentek/t_bird)
 - Code Quality: [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/xentek/t_bird.png)](https://codeclimate.com/github/xentek/t_bird)
