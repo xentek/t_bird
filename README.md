@@ -1,7 +1,8 @@
 # t_bird
 
-Uploading is... fun, fun, fun, until daddy takes the `t_bird` away.
+Straight forward uploads for your Ruby apps.
 
+_Uploading is... fun, fun, fun, until daddy takes the `t_bird` away._
 
 ## Project Status
 
