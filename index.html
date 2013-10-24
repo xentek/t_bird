@@ -100,10 +100,10 @@ the local filesystem.</li>
 
 <div class="highlight highlight-ruby"><pre><span class="c1"># prepended to your filename and enables you</span>
 <span class="c1"># to create a path in your file on S3</span>
-<span class="n">upload_id</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="no">ENV</span><span class="o">[</span><span class="s1">'RACK_ENV'</span><span class="o">]</span><span class="si">}</span><span class="s2">/images/1"</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">identifier</span><span class="p">:</span> <span class="s2">"</span><span class="si">#{</span><span class="no">ENV</span><span class="o">[</span><span class="s1">'RACK_ENV'</span><span class="o">]</span><span class="si">}</span><span class="s2">/images/1"</span> <span class="p">}</span>
 
 <span class="c1"># instantiate your uploader, pass it your file</span>
-<span class="n">uploader</span> <span class="o">=</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:brand</span><span class="o">][</span><span class="ss">:image</span><span class="o">]</span><span class="p">,</span> <span class="ss">identifier</span><span class="p">:</span> <span class="n">upload_id</span><span class="p">)</span>
+<span class="n">uploader</span> <span class="o">=</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:brand</span><span class="o">][</span><span class="ss">:image</span><span class="o">]</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
 
 <span class="c1"># return value is the same as uploader.uploads</span>
 <span class="n">uploader</span><span class="o">.</span><span class="n">upload!</span>
@@ -263,7 +263,7 @@ defined, your uploader won't upload anything.</li>
 so be sure that your <code>processor</code> will respond to any methods the code inside your blocks call on it. </li>
 </ul>
 </li>
-<li>Redefine the <code>upload!</code> to remix the whole show!
+<li>Redefine the <code>upload!</code> method to remix the whole flow!
 
 <ul>
 <li>really the sky's the limit here, but at some point you might be
