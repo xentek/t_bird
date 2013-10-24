@@ -16,8 +16,6 @@ MiniTest::Reporters.use! MiniTest::Reporters::SpecReporter.new
 
 require 'mocha/setup'
 require 'rack/test'
-#include Rack::Test::Methods
-
 require 'uuid'
 
 module TBirdSpecData
