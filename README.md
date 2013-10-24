@@ -65,10 +65,10 @@ In the action the form posts to, grab the uploaded file and upload it with `t_bi
 ````ruby
 # prepended to your filename and enables you
 # to create a path in your file on S3
-upload_id = "#{ENV['RACK_ENV']}/images/1"
+options = { identifier: "#{ENV['RACK_ENV']}/images/1" }
 
 # instantiate your uploader, pass it your file
-uploader = TBird::Uploader.new(params[:brand][:image], identifier: upload_id)
+uploader = TBird::Uploader.new(params[:brand][:image], options)
 
 # return value is the same as uploader.uploads
 uploader.upload!
