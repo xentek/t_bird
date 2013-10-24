@@ -23,13 +23,13 @@ And then execute:
 ## Why?
 
 I became frustrated by the very coupled design of the leading ruby
-upload libraries and wanted something that was a more modular (to
-allow for flexibility), wasn't glued to a `model`, and fulfilled my
-most common use case out of the box: 
+upload libraries and wanted something that was more modular (to
+allow for flexibility), wasn't glued to a `Model` (or any other class),
+and fulfilled my most common use case out of the box: 
 
  - Upload an image, posted from a multi-part form,
  - process the file into 1 or more versions (resize, crop, etc),
- - and stream the files to s3 for storage without keeping anything on
+ - and stream the files to S3 for storage without keeping anything on
    the local filesystem.
 
 ## Usage
@@ -79,7 +79,7 @@ uploader.uploads # returns a hash of urls pointing to your image versions
 There are three options you can pass into your `TBird::Uploader` instance:
 
   - `:identifer`
-    - app specific identifer for his upload, e.g. your model's databae ID, timestamp, whatever
+    - app specific identifer for his upload, e.g. your model's databae ID, the date or timestamp, whatever
     - used as the folder this file's uploads are stored in on s3
       - you can pass a path fragment here to create a folder heirarchy, e.g. 'uploads/images'
       - don't want any folders?, just pass an empty string, e.g. `''`
@@ -159,7 +159,7 @@ end
 ````
 For more information on `MiniMagick::Image#combine_options`, refer to the [mini_magick docs](https://github.com/minimagick/minimagick/blob/master/README.md).
 
-:skull: `TBird::Processor#process` can be a _very sharp stick_, so carefully test your processing code with a variety of files in a non-production environment, and as usual be wary of using values from outside of your class as input for your processing routines.
+:skull: `TBird::Processor#process` can be a _very sharp stick_, so carefully test your processing code with a variety of files in a non-production environment, and as usual, be wary of using values from outside of your class as input for your processing routines.
 
 ## More customization options
 
@@ -170,10 +170,9 @@ For more information on `MiniMagick::Image#combine_options`, refer to the [mini_
     so be sure that your `processor` will respond to any methods the code inside your blocks call on it. 
 - Redefine the `upload!` to remix the whole show!
   - really the sky's the limit here, but at some point you might be
-    better of just writing your own uploader class.
-  - Currently this is the only way to swith out S3 for another storage provider.
-    - Better support changing the storage mechanism will likely come out in a future version.
-    - Talk to me before working on a patch for this, so we can agree on implementation.
+    better of just writing your own uploader class that doesn't sit on
+    top of `t_bird`
+  - Currently this is the only way to swith out S3 for another storage provider. Better support for changing the storage mechanism will likely come out in a future version. Talk to me __before working on a patch__ for this, so we can agree on implementation.
 
 ## Contributing
 
