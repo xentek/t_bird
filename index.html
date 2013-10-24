@@ -47,7 +47,7 @@
 
 <p>Add this line to your application's Gemfile:</p>
 
-<pre><code>gem 't_bird'
+<pre><code>gem 't_bird', require: false
 </code></pre>
 
 <p>And then execute:</p>
@@ -73,7 +73,8 @@ the local filesystem.</li>
 
 <p>First, configure <code>t_bird</code> with a few settings:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="ss">TBird</span><span class="p">:</span><span class="ss">:Configuration</span><span class="o">.</span><span class="n">configure</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'t_bird'</span>
+<span class="ss">TBird</span><span class="p">:</span><span class="ss">:Configuration</span><span class="o">.</span><span class="n">configure</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
   <span class="n">config</span><span class="o">.</span><span class="n">aws_key</span> <span class="s1">'amazon access key id'</span>
   <span class="n">config</span><span class="o">.</span><span class="n">aws_secret</span> <span class="s1">'amazon secret access key'</span>
   <span class="n">config</span><span class="o">.</span><span class="n">aws_bucket</span> <span class="s1">'name of s3 bucket that already exists'</span>
@@ -97,12 +98,19 @@ the local filesystem.</li>
 
 <p>In the action the form posts to, grab the uploaded file and upload it with <code>t_bird</code>:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">uploader</span> <span class="o">=</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:brand</span><span class="o">][</span><span class="ss">:image</span><span class="o">]</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="c1"># prepended to your filename and enables you</span>
+<span class="c1"># to create a path in your file on S3</span>
+<span class="n">upload_id</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="no">ENV</span><span class="o">[</span><span class="s1">'RACK_ENV'</span><span class="o">]</span><span class="si">}</span><span class="s2">/images/1"</span>
 
-<span class="n">uploader</span><span class="o">.</span><span class="n">upload!</span> <span class="c1"># return value is same as uploader.uploads</span>
+<span class="c1"># instantiate your uploader, pass it your file</span>
+<span class="n">uploader</span> <span class="o">=</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:brand</span><span class="o">][</span><span class="ss">:image</span><span class="o">]</span><span class="p">,</span> <span class="ss">identifier</span><span class="p">:</span> <span class="n">upload_id</span><span class="p">)</span>
 
-<span class="n">uploader</span><span class="o">.</span><span class="n">uploads</span> <span class="c1"># returns a hash of urls pointing to your image versions</span>
-                 <span class="c1"># store this in the way that makes the most sense for your app</span>
+<span class="c1"># return value is the same as uploader.uploads</span>
+<span class="n">uploader</span><span class="o">.</span><span class="n">upload!</span>
+
+<span class="c1"># returns a hash of urls pointing to your image versions</span>
+<span class="c1"># store this in the way that makes the most sense, for your app</span>
+<span class="n">uploader</span><span class="o">.</span><span class="n">uploads</span>
 </pre></div>
 
 <ul>
@@ -145,7 +153,7 @@ the local filesystem.</li>
 <code>:token</code>
 
 <ul>
-<li>needs to be a unique value per upload, to help avoid name collisions and writing over existing files</li>
+<li>needs to be a unique value per upload, to help avoid name collisions and writing over any existing files</li>
 <li>used as part of the filename, version and extension are
 automatically appended on to the end.</li>
 <li>defaults to a <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>, think hard before straying from this strategy</li>
