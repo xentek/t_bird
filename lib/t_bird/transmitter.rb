@@ -10,15 +10,19 @@ module TBird
       @name = name
       @file = file
       @metadata = default_metadata.merge(metadata)
+      connect!
     end
 
     def transmit!
-      connect!
-      @tranmission = S3Object.store(name, file, Configuration.aws_bucket, metadata)
+      if @transmission.nil?
+        @transmission = S3Object.store(name, file, Configuration.aws_bucket, metadata)
+      end
+      @success ||= Service.response.success?
+      @success
     end
 
     def url
-      @transmission.url
+      @url ||= S3Object.url_for(name, Configuration.aws_bucket, authenticated: false, use_ssl: true)
     end
 
     private

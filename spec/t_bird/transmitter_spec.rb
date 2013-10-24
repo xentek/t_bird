@@ -17,13 +17,20 @@ describe TBird::Transmitter do
 
     AWS::S3::S3Object.stubs(:connected?).returns(true)
     AWS::S3::Base.stubs(:establish_connection!).with(keys)
+    AWS::S3::Service.stubs(response: stub(:success? => true))
 
     @stored_filename = '1/sample_original.jpg'
-    @transmitter = TBird::Transmitter.new(@stored_filename, upload_filedata, { content_type: 'image/jpeg' })
+    @upload = upload_file
+    @transmitter = TBird::Transmitter.new(@stored_filename, @upload, { content_type: 'image/jpeg' })
   end
 
   it "transmit file to store" do
-    AWS::S3::S3Object.expects(:store).with(@stored_filename, upload_filedata, 'bucket', {:access => :public_read, :content_type => 'image/jpeg'})
+    AWS::S3::S3Object.expects(:store).with(@stored_filename, @upload, 'bucket', {:access => :public_read, :content_type => 'image/jpeg'})
     @transmitter.transmit!
+  end
+
+  it "can return the S3 url for the file uploaded" do
+    AWS::S3::S3Object.expects(:url_for).with(@stored_filename, 'bucket', authenticated: false, use_ssl: true)
+    @transmitter.url
   end
 end
