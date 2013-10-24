@@ -1,0 +1,309 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>t_bird by xentek</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>t_bird</h1>
+        <p>Straight forward file uploads for Ruby Apps</p>
+
+        <p class="view"><a href="https://github.com/xentek/t_bird">View the Project on GitHub <small>xentek/t_bird</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/xentek/t_bird/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/xentek/t_bird/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/xentek/t_bird">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><em>Uploading is... fun, fun, fun, until daddy takes the <code>t_bird</code> away.</em></p>
+
+<h2>
+<a name="project-status" class="anchor" href="#project-status"><span class="octicon octicon-link"></span></a>Project Status</h2>
+
+<ul>
+<li>Build: <a href="http://travis-ci.org/xentek/t_bird"><img src="https://secure.travis-ci.org/xentek/t_bird.png" alt="Build Status"></a>
+</li>
+<li>Dependencies: <a href="https://gemnasium.com/xentek/t_bird"><img src="https://gemnasium.com/xentek/t_bird.png" alt="Dependency Status"></a>
+</li>
+<li>Code Quality: <a href="https://codeclimate.com/github/xentek/t_bird"><img src="https://d3s6mut3hikguw.cloudfront.net/github/xentek/t_bird.png" alt="Code Climate"></a>
+</li>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 't_bird'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<h2>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h2>
+
+<p>I became frustrated by the very coupled design of the leading ruby
+upload libraries and wanted something that was more modular (to
+allow for flexibility), wasn't glued to a <code>Model</code> (or any other class),
+and fulfilled my most common use case out of the box: </p>
+
+<ul>
+<li>Upload an image, posted from a multi-part form,</li>
+<li>process the file into 1 or more versions (resize, crop, etc),</li>
+<li>and stream the files to S3 for storage without keeping anything on
+the local filesystem.</li>
+</ul><h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>First, configure <code>t_bird</code> with a few settings:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="ss">TBird</span><span class="p">:</span><span class="ss">:Configuration</span><span class="o">.</span><span class="n">configure</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">aws_key</span> <span class="s1">'amazon access key id'</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">aws_secret</span> <span class="s1">'amazon secret access key'</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">aws_bucket</span> <span class="s1">'name of s3 bucket that already exists'</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">thumbnail_size</span> <span class="mi">100</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Place this code so that it runs when your app boots.</p>
+
+<ul>
+<li>If you're using Sinatra or Rack, <code>config.ru</code> is probably a good spot.</li>
+<li>If you're using Rails, put the configuration in an initializer, e.g. <code>config/initializers/t_bird.rb</code>.</li>
+</ul><p>Then, assuming you have a multipart form like this:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">form</span> <span class="n">enctype</span><span class="o">=</span><span class="s2">"multipart/form-data"</span> <span class="nb">method</span><span class="o">=</span><span class="s2">"POST"</span>
+  <span class="n">input</span> <span class="n">type</span><span class="o">=</span><span class="s2">"file"</span> <span class="nb">name</span><span class="o">=</span><span class="s2">"brand[image]"</span>
+  <span class="n">input</span> <span class="n">type</span><span class="o">=</span><span class="s2">"submit"</span>
+</pre></div>
+
+<p><em>Example is using <a href="http://slim-lang.com">slim</a> for clarity and terseness, but that doesn't mean you have to.</em></p>
+
+<p>In the action the form posts to, grab the uploaded file and upload it with <code>t_bird</code>:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">uploader</span> <span class="o">=</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:brand</span><span class="o">][</span><span class="ss">:image</span><span class="o">]</span><span class="p">)</span>
+
+<span class="n">uploader</span><span class="o">.</span><span class="n">upload!</span> <span class="c1"># return value is same as uploader.uploads</span>
+
+<span class="n">uploader</span><span class="o">.</span><span class="n">uploads</span> <span class="c1"># returns a hash of urls pointing to your image versions</span>
+                 <span class="c1"># store this in the way that makes the most sense for your app</span>
+</pre></div>
+
+<ul>
+<li>By default, there are two <code>versions</code> defined: <code>:thumbnail</code> and <code>:original</code>.</li>
+<li>
+<code>:thumbnail</code> will create crop a square image from the upload.
+
+<ul>
+<li>You can control the size of the square by setting <code>thumbnail_size</code> in your configuration (see above).</li>
+</ul>
+</li>
+<li>
+<code>:original</code> will be the raw, unadulterated file that the user submitted.</li>
+</ul><h2>
+<a name="options" class="anchor" href="#options"><span class="octicon octicon-link"></span></a>Options</h2>
+
+<p>There are three options you can pass into your <code>TBird::Uploader</code> instance:</p>
+
+<ul>
+<li>
+<code>:identifer</code>
+
+<ul>
+<li>app specific identifer for his upload, e.g. your model's databae ID, the date or timestamp, whatever</li>
+<li>used as the folder this file's uploads are stored in on s3
+
+<ul>
+<li>you can pass a path fragment here to create a folder heirarchy, e.g. 'uploads/images'</li>
+<li>don't want any folders?, just pass an empty string, e.g. <code>''</code>
+</li>
+</ul>
+</li>
+<li>defaults to a <code>SHA1</code> digest of the <code>original_filename</code>
+</li>
+<li>value should be URL safe, no encoding is done for you by <code>t_bird</code>
+</li>
+</ul>
+</li>
+<li>
+<code>:token</code>
+
+<ul>
+<li>needs to be a unique value per upload, to help avoid name collisions and writing over existing files</li>
+<li>used as part of the filename, version and extension are
+automatically appended on to the end.</li>
+<li>defaults to a <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>, think hard before straying from this strategy</li>
+<li>value should be URL safe, no encoding is done for you by <code>t_bird</code>
+</li>
+</ul>
+</li>
+<li>
+<code>:metadata</code>
+
+<ul>
+<li>value must be a hash, as it will be merged in when your uploader is instantiated</li>
+<li>the file's <code>content_type</code> is automatically added to this hash</li>
+<li>values in this hash will be stored, with your file, on S3 as metadata.
+
+<ul>
+<li>this could be used for versioning your files, e.g. <code>version: 2</code> , marking them with
+the name/title of the model it's associated with, etc.</li>
+<li>
+<code>t_bird</code> doesn't provide any read access to this metadata, once it's stored on S3, so it's up to you to use S3's API to do anything with it.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><h2>
+<a name="custom-uploaders" class="anchor" href="#custom-uploaders"><span class="octicon octicon-link"></span></a>Custom Uploaders</h2>
+
+<p>In order to define custom versions, and other advanced customization, create a subclass of <code>TBird::Uploader</code>:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">FileUploader</span> <span class="o">&lt;</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span>
+  <span class="n">version</span> <span class="ss">:original</span> <span class="k">do</span>
+    <span class="o">-&gt;</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">{</span> <span class="n">file</span><span class="o">.</span><span class="n">original</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<ul>
+<li>In this simple example we have created a subclass and defined a single
+version, <code>:original</code>, that skips processing the file, making <code>FileUploader</code> suitable
+for handling non-image uploads.</li>
+<li>No other versions were defined, so only <code>:original</code> will be created.
+
+<ul>
+<li>In other words, if you create a subclass without any <code>versions</code>
+defined, your uploader won't upload anything.</li>
+</ul>
+</li>
+</ul><p>Here's a more complex example that defines several custom <code>versions</code>:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">ComplexUploader</span> <span class="o">&lt;</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span>
+
+  <span class="c1"># resizes image to a *width* of 200px, maintains aspect ratio</span>
+  <span class="n">version</span> <span class="ss">:small</span> <span class="k">do</span>
+    <span class="o">-&gt;</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="p">{</span> <span class="n">img</span><span class="o">.</span><span class="n">resize</span> <span class="s1">'200'</span> <span class="p">}</span> 
+  <span class="k">end</span>
+
+  <span class="c1"># resizes image to a *height* of 300px, maintains aspect ratio</span>
+  <span class="n">version</span> <span class="ss">:large</span> <span class="k">do</span>
+    <span class="o">-&gt;</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="p">{</span> <span class="n">img</span><span class="o">.</span><span class="n">resize</span> <span class="s1">'x300'</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># resizes image to a *height* of 300px, maintains aspect ratio</span>
+  <span class="n">version</span> <span class="ss">:resized</span> <span class="k">do</span>
+    <span class="o">-&gt;</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="p">{</span> <span class="n">img</span><span class="o">.</span><span class="n">resize</span> <span class="s1">'500x300'</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># custom thumbnail size, allowing your to ignore</span>
+  <span class="c1"># the value of TBird::Configuration.thumbnail_size</span>
+  <span class="c1"># on an uploader by uploader basis</span>
+  <span class="n">version</span> <span class="ss">:thumbnail</span> <span class="k">do</span>
+    <span class="o">-&gt;</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="p">{</span> <span class="n">img</span><span class="o">.</span><span class="n">thumbnail</span> <span class="mi">200</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># want MOAR power?</span>
+  <span class="c1"># use process, which gets you inside a</span>
+  <span class="c1"># MiniMagick::Image#combine_options block</span>
+  <span class="n">version</span> <span class="ss">:complex</span> <span class="k">do</span>
+    <span class="nb">lambda</span> <span class="k">do</span> <span class="o">|</span><span class="n">img</span><span class="o">|</span>
+      <span class="n">img</span><span class="o">.</span><span class="n">process</span> <span class="k">do</span> <span class="o">|</span><span class="n">magick</span><span class="o">|</span>
+        <span class="n">magick</span><span class="o">.</span><span class="n">sample</span> <span class="s2">"50%"</span>
+        <span class="n">magick</span><span class="o">.</span><span class="n">rotate</span> <span class="s2">"-90&gt;"</span>
+        <span class="n">magick</span><span class="o">.</span><span class="n">quality</span> <span class="s1">'88'</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>For more information on <code>MiniMagick::Image#combine_options</code>, refer to the <a href="https://github.com/minimagick/minimagick/blob/master/README.md">mini_magick docs</a>.</p>
+
+<p><img class="emoji" title=":skull:" alt=":skull:" src="https://github.global.ssl.fastly.net/images/icons/emoji/skull.png" height="20" width="20" align="absmiddle"><code>TBird::Processor#process</code> can be a <em>very sharp stick</em>, so carefully test your processing code with a variety of files in a non-production environment, and as usual, be wary of using values from outside of your class as input for your processing routines.</p>
+
+<h2>
+<a name="more-customization-options" class="anchor" href="#more-customization-options"><span class="octicon octicon-link"></span></a>More customization options</h2>
+
+<ul>
+<li>Redefine the <code>namer</code> method in your subclass to switch out the object that's responsible for generating the name used on S3.
+
+<ul>
+<li>Your object must respond to <code>new_name</code>, and take the <code>version</code>, which will be a symbol, as input.</li>
+</ul>
+</li>
+<li>Redefine the <code>processor</code> method in your subclass to switch out the processing library.
+
+<ul>
+<li>Blocks defined by the <code>version</code> macro will be passed an instance of your <code>processor</code>,
+so be sure that your <code>processor</code> will respond to any methods the code inside your blocks call on it. </li>
+</ul>
+</li>
+<li>Redefine the <code>upload!</code> to remix the whole show!
+
+<ul>
+<li>really the sky's the limit here, but at some point you might be
+better of just writing your own uploader class that doesn't sit on
+top of <code>t_bird</code>
+</li>
+<li>Currently this is the only way to swith out S3 for another storage provider.
+
+<ul>
+<li>Better support for changing the storage mechanism will likely come out in a future version.</li>
+<li>Talk to me <strong>before working on a patch</strong> for this, so we can agree on implementation.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+<li>???</li>
+<li>Profit!</li>
+</ol><h4>
+<a name="colophon" class="anchor" href="#colophon"><span class="octicon octicon-link"></span></a>Colophon</h4>
+
+<ul>
+<li>This project was not named after the Thunderbird model of car. Ford Motor Company does not have any connection to, or responsibility for this project, and does not endorse it in any way (or even know it exists. Probably).</li>
+<li>Sample image, used in tests, was provided by <a href="http://www.flickr.com/photos/cherrylet/10258332985/sizes/o/in/photostream/">cherrylet</a>, under the Creative Commons 2.0. No endorsement of this library by the photographer is intended or implied.</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/xentek">xentek</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-102539-23");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
