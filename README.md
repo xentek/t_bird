@@ -46,8 +46,8 @@ end
 ````
 Place this code so that it runs when your app boots.
 
-- If you're using Sinatra or Rack, `config.ru` is probably a good spot.
-- If you're using Rails, put the configuration in an initializer, e.g. `config/initializers/t_bird.rb`.
+  - If you're using Sinatra or Rack, `config.ru` is probably a good spot.
+  - If you're using Rails, put the configuration in an initializer, e.g. `config/initializers/t_bird.rb`.
 
 Then, assuming you have a multipart form like this:
 
@@ -138,14 +138,16 @@ class ComplexUploader < TBird::Uploader
     ->(img) { img.resize '500x300' }
   end
 
-  # custom thumbnail size, allowing your to ignore TBird::Configuration.thumbnail_size
+  # custom thumbnail size, allowing your to ignore
+  # the value of TBird::Configuration.thumbnail_size
   # on an uploader by uploader basis
   version :thumbnail do
     ->(img) { img.thumbnail 200 }
   end
 
   # want MOAR power?
-  # use process, which gets you inside a MiniMagick::Image#combine_options block
+  # use process, which gets you inside a
+  # MiniMagick::Image#combine_options block
   version :complex do
     lambda do |img|
       img.process do |magick|
@@ -163,16 +165,18 @@ For more information on `MiniMagick::Image#combine_options`, refer to the [mini_
 
 ## More customization options
 
-- Redefine the `namer` method in your subclass to switch out the object that's responsible for generating the name used on S3.
-  - Your object must respond to `new_name`, and take the `version`, which will be a symbol, as input.
-- Redefine the `processor` method in your subclass to switch out the processing library.
-  - Blocks defined by the `version` macro will be passed an instance of your `processor`,
-    so be sure that your `processor` will respond to any methods the code inside your blocks call on it. 
-- Redefine the `upload!` to remix the whole show!
-  - really the sky's the limit here, but at some point you might be
-    better of just writing your own uploader class that doesn't sit on
-    top of `t_bird`
-  - Currently this is the only way to swith out S3 for another storage provider. Better support for changing the storage mechanism will likely come out in a future version. Talk to me __before working on a patch__ for this, so we can agree on implementation.
+  - Redefine the `namer` method in your subclass to switch out the object that's responsible for generating the name used on S3.
+    - Your object must respond to `new_name`, and take the `version`, which will be a symbol, as input.
+  - Redefine the `processor` method in your subclass to switch out the processing library.
+    - Blocks defined by the `version` macro will be passed an instance of your `processor`,
+      so be sure that your `processor` will respond to any methods the code inside your blocks call on it. 
+  - Redefine the `upload!` to remix the whole show!
+    - really the sky's the limit here, but at some point you might be
+      better of just writing your own uploader class that doesn't sit on
+      top of `t_bird`
+    - Currently this is the only way to swith out S3 for another storage provider.
+      - Better support for changing the storage mechanism will likely come out in a future version.
+      - Talk to me __before working on a patch__ for this, so we can agree on implementation.
 
 ## Contributing
 
