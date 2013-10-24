@@ -179,7 +179,7 @@ For more information on `MiniMagick::Image#combine_options`, refer to the [mini_
   - Redefine the `processor` method in your subclass to switch out the processing library.
     - Blocks defined by the `version` macro will be passed an instance of your `processor`,
       so be sure that your `processor` will respond to any methods the code inside your blocks call on it. 
-  - Redefine the `upload!` to remix the whole show!
+  - Redefine the `upload!` method to remix the whole flow!
     - really the sky's the limit here, but at some point you might be
       better of just writing your own uploader class that doesn't sit on
       top of `t_bird`
