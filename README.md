@@ -15,7 +15,7 @@ _Uploading is... fun, fun, fun, until daddy takes the `t_bird` away._
 
 Add this line to your application's Gemfile:
 
-    gem 't_bird'
+    gem 't_bird', require: false
 
 And then execute:
 
@@ -38,6 +38,7 @@ and fulfilled my most common use case out of the box:
 First, configure `t_bird` with a few settings:
 
 ````ruby
+require 't_bird'
 TBird::Configuration.configure |config|
   config.aws_key 'amazon access key id'
   config.aws_secret 'amazon secret access key'
@@ -62,12 +63,19 @@ _Example is using [slim](http://slim-lang.com) for clarity and terseness, but th
 In the action the form posts to, grab the uploaded file and upload it with `t_bird`:
 
 ````ruby
-uploader = TBird::Uploader.new(params[:brand][:image])
+# prepended to your filename and enables you
+# to create a path in your file on S3
+upload_id = "#{ENV['RACK_ENV']}/images/1"
 
-uploader.upload! # return value is same as uploader.uploads
+# instantiate your uploader, pass it your file
+uploader = TBird::Uploader.new(params[:brand][:image], identifier: upload_id)
 
-uploader.uploads # returns a hash of urls pointing to your image versions
-                 # store this in the way that makes the most sense for your app
+# return value is the same as uploader.uploads
+uploader.upload!
+
+# returns a hash of urls pointing to your image versions
+# store this in the way that makes the most sense, for your app
+uploader.uploads
 ````
 
 - By default, there are two `versions` defined: `:thumbnail` and `:original`.
