@@ -190,5 +190,5 @@ For more information on `MiniMagick::Image#combine_options`, refer to the [mini_
 
 #### Colophon
 
-  - This project was not named after the Thunderbird model of car. Ford Motor Company does not have any connection to, or responsibility for this project, and does not endorse it in any way (or even know it exists).
+  - This project was not named after the Thunderbird model of car. Ford Motor Company does not have any connection to, or responsibility for this project, and does not endorse it in any way (or even know it exists. Probably).
   - Sample image, used in tests, was provided by [cherrylet](http://www.flickr.com/photos/cherrylet/10258332985/sizes/o/in/photostream/), under the Creative Commons 2.0. No endorsement of this library by the photographer is intended or implied.
