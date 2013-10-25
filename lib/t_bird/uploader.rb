@@ -7,8 +7,8 @@ module TBird
       @file = file
       @options = default_options.merge(options)
       @uploads = {}
-      @content_type = @file.content_type
-      @original_filename = @file.original_filename
+      @content_type = @file[:type]
+      @original_filename = @file[:filename]
       @options[:metadata].merge!(content_type: content_type)
     end
 
@@ -17,7 +17,7 @@ module TBird
     end
 
     def processor
-      @processor ||= Processor.new(@file)
+      @processor ||= Processor.new(@file[:tempfile])
     end
 
     def upload!

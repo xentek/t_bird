@@ -24,10 +24,12 @@ module TBirdSpecData
   end
 
   def upload_file
-    Rack::Test::UploadedFile.new(sample_file, 'image/jpeg')
-  end
+    upload = Rack::Test::UploadedFile.new(sample_file, 'image/jpeg')
 
-  def upload_filedata
-    upload_file.read
+    {
+      filename: upload.original_filename,
+      type: upload.content_type,
+      tempfile: upload.instance_variable_get(:@tempfile)
+    }
   end
 end

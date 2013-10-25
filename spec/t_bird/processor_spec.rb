@@ -7,7 +7,7 @@ describe TBird::Processor do
 
   before do
     @custom_process = ->(img) { img.quality 88 }
-    @processor = TBird::Processor.new(upload_file)
+    @processor = TBird::Processor.new(upload_file[:tempfile])
   end
 
   it "can process an image" do
