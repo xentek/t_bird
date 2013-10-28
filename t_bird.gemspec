@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'mini_magick'
-  gem.add_dependency 'aws-s3'
+  gem.add_dependency 'aws-sdk'
   gem.add_development_dependency 'bundler', '~> 1.3'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'gem-release'
