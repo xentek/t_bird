@@ -2,14 +2,14 @@
 
 module TBird
   class Uploader
-    attr_reader :file, :options, :uploads, :content_type, :original_filename
+    attr_reader :file, :options, :uploads, :content_type, :original_filename, :metadata
     def initialize(file, options = {})
       @file = file
       @options = default_options.merge(options)
       @uploads = {}
       @content_type = @file[:type]
       @original_filename = @file[:filename]
-      @options[:metadata].merge!(content_type: content_type)
+      @metadata = { content_type: content_type, metadata: @options[:metadata] || {} }
     end
 
     def namer
@@ -26,7 +26,7 @@ module TBird
 
     def upload!
       versions.each do |version,block|
-        @uploads[version] = transmitter.transmit!(namer.new_name(version), block.call(processor), options[:metadata])
+        @uploads[version] = transmitter.transmit!(namer.new_name(version), block.call(processor), metadata)
       end
       uploads
     end
@@ -52,8 +52,7 @@ module TBird
     def default_options
       {
         identifier: nil,
-        token: nil,
-        metadata: {}
+        token: nil
       }
     end
   end

@@ -16,8 +16,13 @@ describe TBird::Uploader do
   end
 
   it "can return the options" do
-    @uploader.options.must_equal({ identifier: nil, token: nil, metadata: { content_type: "image/jpeg" } })
+    @uploader.options.must_equal({ identifier: nil, token: nil })
   end
+
+  it "can return the metadata" do
+    @uploader.metadata.must_equal({ content_type: 'image/jpeg', metadata: {} })
+  end
+  
 
   it "can return the content type" do
     @uploader.content_type.must_equal 'image/jpeg'
