@@ -30,8 +30,7 @@ and fulfilled my most common use case out of the box:
 
  - Upload an image, posted from a multi-part form,
  - process the file into 1 or more versions (resize, crop, etc),
- - and stream the files to S3 for storage without keeping anything on
-   the local filesystem.
+ - and upload the file(s) to S3 for storage.
 
 ## Usage
 
@@ -64,8 +63,8 @@ In the action the form posts to, grab the uploaded file and upload it with `t_bi
 
 ````ruby
 # prepended to your filename and enables you
-# to create a path in your file on S3
-options = { identifier: "#{ENV['RACK_ENV']}/images/1" }
+# to create a path to your file on S3
+options = { identifier: "images/brands" }
 
 # instantiate your uploader, pass it your file
 uploader = TBird::Uploader.new(params[:brand][:image], options)
@@ -73,9 +72,9 @@ uploader = TBird::Uploader.new(params[:brand][:image], options)
 # return value is the same as uploader.uploads
 uploader.upload!
 
-# returns a hash of urls pointing to your image versions
-# store this in the way that makes the most sense, for your app
-uploader.uploads
+# returns a hash of the URL(s) to your uploads on S3
+# store this in the way that makes the most sense for your app
+brand.images = uploader.uploads
 ````
 
 - By default, there are two `versions` defined: `:thumbnail` and `:original`.
@@ -98,15 +97,16 @@ There are three options you can pass into your `TBird::Uploader` instance:
     - needs to be a unique value per upload, to help avoid name collisions and writing over any existing files
     - used as part of the filename, version and extension are
       automatically appended on to the end.
-    - defaults to a [UUID](http://en.wikipedia.org/wiki/Universally_unique_identifier), think hard before straying from this strategy
+    - defaults to a [UUID](http://en.wikipedia.org/wiki/Universally_unique_identifier)
+      - think hard before straying from this strategy, UUIDs are generated quickly and
+        are nearly immune to collision (there is a higher probablity of you personally being
+        struck by a metorite than generating two UUIDs that have the same value.)
     - value should be URL safe, no encoding is done for you by `t_bird`
   - `:metadata`
-    - value must be a hash, as it will be merged in when your uploader is instantiated
-    - the file's `content_type` is automatically added to this hash
-    - values in this hash will be stored, with your file, on S3 as metadata.
-      - this could be used for versioning your files, e.g. `version: 2` , marking them with
-        the name/title of the model it's associated with, etc.
-      - `t_bird` doesn't provide any read access to this metadata, once it's stored on S3, so it's up to you to use S3's API to do anything with it.
+    - value must be a hash
+    - values in this hash will be stored, with your file, on S3
+      - this could be used for tagging your files, e.g. `tags: brands, images`, or anything else you might think of
+      - `t_bird` doesn't provide any read access to this metadata, once it's stored on S3. It's up to you to use S3's API to do anything with it.
 
 ## Custom Uploaders
 
@@ -120,12 +120,10 @@ class FileUploader < TBird::Uploader
 end
 ````
 
-- In this simple example we have created a subclass and defined a single
-version, `:original`, that skips processing the file, making `FileUploader` suitable
-for handling non-image uploads.
+- In this simple example we have created a subclass and defined a single version, `:original`
 - No other versions were defined, so only `:original` will be created.
-  - In other words, if you create a subclass without any `versions`
-    defined, your uploader won't upload anything.
+  - In other words, if you create a subclass without any `versions` defined, your uploader
+    won't upload anything.
 
 Here's a more complex example that defines several custom `versions`:
 
