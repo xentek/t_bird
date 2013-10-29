@@ -22,7 +22,7 @@ module TBird
 
     def default_options
       { 
-        acl: 'public-read',
+        acl: :public_read,
         content_type: 'binary/octet-stream',
         metadata: {}
       }
