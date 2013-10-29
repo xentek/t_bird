@@ -11,32 +11,32 @@ describe TBird::Processor do
   end
 
   it "can process an image" do
-    image = @processor.process(&@custom_process)
-    image.valid?.must_equal true
-    image.destroy!
+    @processor.process(&@custom_process)
+    @processor.image.valid?.must_equal true
+    @processor.image.destroy!
   end
 
   it "can thumbnail an image" do
-    image = @processor.thumbnail
-    image.valid?.must_equal true
-    image.destroy!
+    @processor.thumbnail
+    @processor.image.valid?.must_equal true
+    @processor.image.destroy!
   end
 
   it "can resize an image" do
-    image = @processor.resize('300')
-    image.valid?.must_equal true
-    image.destroy!
+    @processor.resize('300')
+    @processor.image.valid?.must_equal true
+    @processor.image.destroy!
   end
 
   it "can return the original image" do
-    image = @processor.original
-    image.valid?.must_equal true
-    image.destroy!
+    @processor.original
+    @processor.image.valid?.must_equal true
+    @processor.image.destroy!
   end
 
-  it "can write image to a stream" do
-    image = @processor.resize('x200')
-    @processor.stream.must_be_instance_of StringIO
-    image.destroy!
+  it "can write image" do
+    @processor.resize('x200')
+    @processor.write_to_file.must_be_instance_of File
+    @processor.image.destroy!
   end
 end

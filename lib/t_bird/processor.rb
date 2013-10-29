@@ -7,21 +7,23 @@ module TBird
     attr_reader :image
     def initialize(file_blob)
       @image = MiniMagick::Image.read(file_blob)
+      @tempfile = Tempfile.new(SecureRandom.uuid)
     end
 
     def process(&block)
       image.combine_options do |img|
         block.call(img) if block_given?
       end
-      image
+      write_to_file
     end
 
-    def stream
-      image.write StringIO.new
+    def write_to_file
+      image.write @tempfile
+      @tempfile
     end
     
     def original
-      image # noop
+      write_to_file
     end
 
     def resize(size)
