@@ -28,7 +28,7 @@
         </ul>
       </header>
       <section>
-        <p><em>Uploading is... fun, fun, fun, until daddy takes the <code>t_bird</code> away.</em></p>
+        <p><em>Uploading is... fun, fun, fun, 'til daddy takes the <code>t_bird</code> away.</em></p>
 
 <h2>
 <a name="project-status" class="anchor" href="#project-status"><span class="octicon octicon-link"></span></a>Project Status</h2>
@@ -66,8 +66,7 @@ and fulfilled my most common use case out of the box: </p>
 <ul>
 <li>Upload an image, posted from a multi-part form,</li>
 <li>process the file into 1 or more versions (resize, crop, etc),</li>
-<li>and stream the files to S3 for storage without keeping anything on
-the local filesystem.</li>
+<li>and upload the file(s) to S3 for storage.</li>
 </ul><h2>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
@@ -99,8 +98,8 @@ the local filesystem.</li>
 <p>In the action the form posts to, grab the uploaded file and upload it with <code>t_bird</code>:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="c1"># prepended to your filename and enables you</span>
-<span class="c1"># to create a path in your file on S3</span>
-<span class="n">options</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">identifier</span><span class="p">:</span> <span class="s2">"</span><span class="si">#{</span><span class="no">ENV</span><span class="o">[</span><span class="s1">'RACK_ENV'</span><span class="o">]</span><span class="si">}</span><span class="s2">/images/1"</span> <span class="p">}</span>
+<span class="c1"># to create a path to your file on S3</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">identifier</span><span class="p">:</span> <span class="s2">"images/brands"</span> <span class="p">}</span>
 
 <span class="c1"># instantiate your uploader, pass it your file</span>
 <span class="n">uploader</span> <span class="o">=</span> <span class="ss">TBird</span><span class="p">:</span><span class="ss">:Uploader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:brand</span><span class="o">][</span><span class="ss">:image</span><span class="o">]</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
@@ -108,9 +107,9 @@ the local filesystem.</li>
 <span class="c1"># return value is the same as uploader.uploads</span>
 <span class="n">uploader</span><span class="o">.</span><span class="n">upload!</span>
 
-<span class="c1"># returns a hash of urls pointing to your image versions</span>
-<span class="c1"># store this in the way that makes the most sense, for your app</span>
-<span class="n">uploader</span><span class="o">.</span><span class="n">uploads</span>
+<span class="c1"># returns a hash of the URL(s) to your uploads on S3</span>
+<span class="c1"># store this in the way that makes the most sense for your app</span>
+<span class="n">brand</span><span class="o">.</span><span class="n">images</span> <span class="o">=</span> <span class="n">uploader</span><span class="o">.</span><span class="n">uploads</span>
 </pre></div>
 
 <ul>
@@ -156,7 +155,14 @@ the local filesystem.</li>
 <li>needs to be a unique value per upload, to help avoid name collisions and writing over any existing files</li>
 <li>used as part of the filename, version and extension are
 automatically appended on to the end.</li>
-<li>defaults to a <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>, think hard before straying from this strategy</li>
+<li>defaults to a <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>
+
+<ul>
+<li>think hard before straying from this strategy, UUIDs are generated quickly and
+are nearly immune to collision (there is a higher probablity of you personally being
+struck by a metorite than generating two UUIDs that have the same value.)</li>
+</ul>
+</li>
 <li>value should be URL safe, no encoding is done for you by <code>t_bird</code>
 </li>
 </ul>
@@ -165,15 +171,13 @@ automatically appended on to the end.</li>
 <code>:metadata</code>
 
 <ul>
-<li>value must be a hash, as it will be merged in when your uploader is instantiated</li>
-<li>the file's <code>content_type</code> is automatically added to this hash</li>
-<li>values in this hash will be stored, with your file, on S3 as metadata.
+<li>value must be a hash</li>
+<li>values in this hash will be stored, with your file, on S3
 
 <ul>
-<li>this could be used for versioning your files, e.g. <code>version: 2</code> , marking them with
-the name/title of the model it's associated with, etc.</li>
+<li>this could be used for tagging your files, e.g. <code>tags: brands, images</code>, or anything else you might think of</li>
 <li>
-<code>t_bird</code> doesn't provide any read access to this metadata, once it's stored on S3, so it's up to you to use S3's API to do anything with it.</li>
+<code>t_bird</code> doesn't provide any read access to this metadata, once it's stored on S3. It's up to you to use S3's API to do anything with it.</li>
 </ul>
 </li>
 </ul>
@@ -191,14 +195,13 @@ the name/title of the model it's associated with, etc.</li>
 </pre></div>
 
 <ul>
-<li>In this simple example we have created a subclass and defined a single
-version, <code>:original</code>, that skips processing the file, making <code>FileUploader</code> suitable
-for handling non-image uploads.</li>
+<li>In this simple example we have created a subclass and defined a single version, <code>:original</code>
+</li>
 <li>No other versions were defined, so only <code>:original</code> will be created.
 
 <ul>
-<li>In other words, if you create a subclass without any <code>versions</code>
-defined, your uploader won't upload anything.</li>
+<li>In other words, if you create a subclass without any <code>versions</code> defined, your uploader
+won't upload anything.</li>
 </ul>
 </li>
 </ul><p>Here's a more complex example that defines several custom <code>versions</code>:</p>
