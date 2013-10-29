@@ -22,7 +22,7 @@ describe TBird::Transmitter do
 
   it "can connect to s3" do
     AWS::S3.expects(:new).with(access_key_id: TBird::Configuration.aws_key, secret_access_key: TBird::Configuration.aws_secret)
-    TBird::Transmitter.new 
+    TBird::Transmitter.new
   end
 
   it "can select s3 bucket" do
@@ -32,7 +32,7 @@ describe TBird::Transmitter do
 
   it "can transmit file to s3" do
     @bucket.expects(:objects).returns({ @stored_filename => @s3object })
-    @s3object.expects(:write).with(@upload, { acl: :public_read, content_type: 'image/jpeg', metadata: {} }).returns(@s3object)
+    @s3object.expects(:write).with(@upload, { acl: 'public-read', content_type: 'image/jpeg', metadata: {} }).returns(@s3object)
     AWS::S3.stubs(:new).returns(stub(buckets: @bucket_collection))
     TBird::Transmitter.new.transmit!(@stored_filename, @upload, { content_type: 'image/jpeg' }).must_equal "https://bucket.s3.amazonaws.com/1/sample_original.jpg"
   end
