@@ -17,7 +17,7 @@ module TBird
     end
 
     def processor
-      @processor ||= Processor.new(@file[:tempfile])
+      Processor.new(@file[:tempfile])
     end
 
     def transmitter
@@ -26,8 +26,7 @@ module TBird
 
     def upload!
       versions.each do |version,block|
-        block.call(processor)
-        @uploads[version] = transmitter.transmit!(namer.new_name(version), processor.stream, options[:metadata])
+        @uploads[version] = transmitter.transmit!(namer.new_name(version), block.call(processor), options[:metadata])
       end
       uploads
     end
