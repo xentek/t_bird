@@ -6,6 +6,7 @@ module TBird
   class Processor
     attr_reader :image
     def initialize(file_blob)
+      @file_blob = file_blob
       @image = MiniMagick::Image.read(file_blob)
       @tempfile = Tempfile.new(SecureRandom.uuid)
     end
@@ -23,7 +24,7 @@ module TBird
     end
     
     def original
-      write_to_file
+      @file_blob
     end
 
     def resize(size)
