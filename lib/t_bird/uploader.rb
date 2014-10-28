@@ -2,14 +2,15 @@
 
 module TBird
   class Uploader
-    attr_reader :file, :options, :uploads, :content_type, :original_filename, :metadata
+    attr_reader :file, :acl, :options, :uploads, :content_type, :original_filename, :metadata
     def initialize(file, options = {})
       @file = file
+      @acl = options.fetch(:acl, :public_read)
       @options = default_options.merge(options)
       @uploads = {}
       @content_type = @file[:type]
       @original_filename = @file[:filename]
-      @metadata = { content_type: content_type, metadata: @options[:metadata] || {} }
+      @metadata = { acl: acl, content_type: content_type, metadata: @options[:metadata] || {} }
     end
 
     def namer
