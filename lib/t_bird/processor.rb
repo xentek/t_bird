@@ -22,7 +22,7 @@ module TBird
       image.write @tempfile
       @tempfile
     end
-    
+
     def original
       @file_blob
     end

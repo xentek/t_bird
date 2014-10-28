@@ -36,7 +36,8 @@ describe TBird::Processor do
 
   it "can write image" do
     @processor.resize('x200')
-    @processor.write_to_file.must_be_instance_of File
+    @processor.write_to_file.must_be_instance_of TempFile if jruby?
+    @processor.write_to_file.must_be_instance_of File unless jruby?
     @processor.image.destroy!
   end
 end
