@@ -20,7 +20,7 @@ describe TBird::Uploader do
   end
 
   it "can return the metadata" do
-    @uploader.metadata.must_equal({ content_type: 'image/jpeg', metadata: {} })
+    @uploader.metadata.must_equal({ acl: :public_read, content_type: 'image/jpeg', metadata: {} })
   end
   
 
