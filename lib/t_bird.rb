@@ -6,6 +6,7 @@ require 't_bird/processor'
 require 't_bird/transmitter'
 require 't_bird/uploader'
 require 't_bird/version'
+require 'tempfile'
 
 module TBird
   module Errors
